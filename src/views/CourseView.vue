@@ -380,11 +380,18 @@ const option = {
     },
     methods: {
         exit() {
+        _axios.post("/user/exit").then(resp => {
+          if (resp.data.code == 1) {
+            this.$message({
+              message: '退出成功',
+              type: 'success'
+            });
             sessionStorage.clear('jwt');
             sessionStorage.clear('user');
-            this.$router.push("/main")
-            /* window.location.reload(); */
-        },
+            window.location.reload();
+          }
+        })
+      },
         close() {
             this.user = {
                 username: '',

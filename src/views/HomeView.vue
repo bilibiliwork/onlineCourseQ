@@ -54,11 +54,10 @@
             </div>
             <div data-v-61b17279 class="h_login">
               <div data-v-61b17279 class="login_con">
-                <div v-if="! isLogin()">
-                  <span data-v-61b17279 class="h_login_login txt" @click="dialogFormVisible = true">登录</span>
-                  <span data-v-61b17279 class="h_login_login bttn">注册</span>
-                </div>
-
+                <span v-if="! isLogin()" data-v-61b17279 class="h_login_login txt"
+                  @click="dialogFormVisible = true">登录</span>
+                <span v-if="! isLogin()" data-v-61b17279 class="h_login_login bttn"
+                  @click="registerFormVisible = true">注册</span>
                 <el-popover v-if="isLogin()" popper-class="el-popper1" placement="bottom" trigger="hover" width="312">
                   <div data-v-61b17279 class="sys-menu">
                     <ul class="h_login_menu_pcc">
@@ -193,6 +192,37 @@
     </div>
 
     <div data-v-c6eed236 data-v-0e4b0658 class="loginWrap">
+      <el-dialog :visible.sync="registerFormVisible" @close="close()">
+        <div data-v-2bb13dfb data-v-c6eed236 class="all-box pla-all">
+          <div data-v-2bb13dfb class="login-box">
+            <ul data-v-2bb13dfb class="login-type-list">
+              <li data-v-2bb13dfb> 邮箱注册 </li>
+            </ul>
+            <div data-v-2bb13dfb class="login-content-list">
+              <div data-v-2bb13dfb class="register-list">
+                <el-form data-v-2bb13dfb :model="registerUser" :rules="registerRules" label-width="auto" style>
+                  <el-form-item class=" el-form-item--medium" prop="username">
+                    <el-input placeholder="请输入邮箱" prefix-icon="User" style="width: 300px" v-model="registerUser.email" />
+                  </el-form-item>
+                  <el-form-item class=" el-form-item--medium" prop="username">
+                    <el-input placeholder="请输入密码" prefix-icon="User" style="width: 300px" v-model="registerUser.password" />
+                  </el-form-item>
+                  <el-form-item class=" el-form-item--medium" prop="username">
+                    <el-input placeholder="请输入邮箱验证码" prefix-icon="User" style="width: 300px" v-model="registerUser.checkCode">
+                      <template slot="append"><el-link type="primary">获取验证码</el-link></template>
+                    </el-input>
+                  </el-form-item>
+                </el-form>
+                <button data-v-2bb13dfb class="submit-btn continue">继续</button>
+                <p data-v-2bb13dfb class="login-tip">若已有账号，无需再注册</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+    </div>
+
+    <div data-v-c6eed236 data-v-0e4b0658 class="loginWrap">
       <el-dialog :visible.sync="dialogFormVisible" @close="close()">
         <div data-v-2bb13dfb data-v-c6eed236 class="all-box pla-all">
           <div data-v-2bb13dfb class="login-box">
@@ -247,10 +277,15 @@ const option = {
           { required: true, message: '请输入密码', trigger: 'blur' }
         ],
       },
-
+      registerFormVisible: false,
       user: {
         username: '',
         password: ''
+      },
+      registerUser:{
+        checkCode: '',
+        password: '',
+        email: ''
       },
       search: "",
       dialogFormVisible: false
@@ -258,13 +293,27 @@ const option = {
     },
     methods: {
       exit() {
+        _axios.post("/user/exit").then(resp => {
+          if (resp.data.code == 1) {
+            this.$message({
+              message: '退出成功',
+              type: 'success'
+            });
             sessionStorage.clear('jwt');
             sessionStorage.clear('user');
             window.location.reload();
-        },
-      close(){
-        this.user = {username: '',
-        password: ''}
+          }
+        })
+      },
+      close() {
+        this.user = {
+          username: '',
+          password: ''
+        }, this.registerUser = {
+            checkCode: '',
+            password: '',
+            email: ''
+          }
       },
       login(){
         _axios.post("/user/login",this.user).then(resp =>{
@@ -418,6 +467,36 @@ a {
 .loginWrap[data-v-c6eed236] .el-dialog .el-dialog__body {
     padding: 0;
 }
+.loginWrap[data-v-c6eed236]  .login-protocol, .loginWrap[data-v-c6eed236]  .login-tip {
+    color: #90949d;
+    font-size: 12px;
+    line-height: 18px;
+    margin: 12px 0 0;
+}
+
+.loginWrap[data-v-c6eed236]  .submit-btn.continue{
+  background: #1769fe !important;
+  margin: 50px 0 0 !important;
+}
+
+.loginWrap[data-v-c6eed236]  .submit-btn {
+  
+    background: #3d7bff;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    margin: 20px 0 0;
+    outline: none;
+    padding: 8px 28px;
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
 
 
 .loginWrap[data-v-c6eed236] .all-box {
@@ -524,9 +603,9 @@ a {
     width: 1px;
 }
 
-.loginWrap[data-v-c6eed236] .all-box .submit-btn.disable {
+.loginWrap[data-v-c6eed236] .all-box .submit-btn.continue {
     cursor: default;
-    opacity: .3;
+    /* opacity: .3; */
 }
 
 .loginWrap[data-v-c6eed236] .all-box .submit-btn {
@@ -716,11 +795,13 @@ button, input, optgroup, select, textarea {
     cursor: pointer;
     font-size: 16px;
     line-height: 22px;
-    min-width: 72px;
+    min-width: 72px ;
     padding: 7px;
     text-align: center;
 }
-
+.header .h_login .h_login_login.txt[data-v-61b17279]:hover {
+    color: #1769fe;
+}
 .header .h_login .h_login_login.txt[data-v-61b17279] {
     color: #696e7b;
 }
@@ -769,7 +850,6 @@ i{
 .el-popper[x-placement^=bottom] {
     margin-top: 12px;
 }
-
 
 .el-popover {
     background: #fff;
