@@ -26,7 +26,7 @@
                                     <a data-v-61b17279 target="_parent" href="#" class>同等学力</a>
                                 </div>
                             </li>
-                            <li data-v-61b17279>
+                            <li data-v-61b17279 v-if="$store.state.user.role === 1">
                                 <router-link to="/teacherRoot/courseList">
                                     <div data-v-61b17279 class="corner" style="cursor: pointer; color: #0897b4;
                                 font-size: 18px;

@@ -333,16 +333,18 @@ const options = {
         },
         getCommentByDid(){
             _axios.get("/comment/discuss/"+this.discussId).then(resp => {
-                this.commentList = resp.data.data
+                this.commentList = resp.data.data.map(item => ({
+                    ...item,
+                    commentVoTrees: item.commentVoTrees || [] // 确保不会是 null
+                }));
             })
         },
         like(treeNodeId){
-            console.log(1)
             let treeNode = this.commentList.find(item => item.id === treeNodeId);
             if (!treeNode) {
+                console.log(this.commentList)
                 treeNode = this.commentList.flatMap(item => item.commentVoTrees).find(treeNode => treeNode.id === treeNodeId);
             }
-            console.log(2)
             if (treeNode) {
                 _axios.post("/comment/like",treeNode).then(resp => {
                     if(resp.data.code === 1){
@@ -438,7 +440,7 @@ const options = {
                         this.$set(item, 'commentVoTrees', []); // 使用 $set 初始化数组
                     }
                     item.commentVoTrees.push(this.commentDto);
-                    console.log("treenode添加完成")
+                    console.log("treenode添加完成+"+this.commentDto.id)
                 }
             } else {
                 this.$message({
