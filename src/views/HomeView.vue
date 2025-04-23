@@ -200,20 +200,20 @@
             </ul>
             <div data-v-2bb13dfb class="login-content-list">
               <div data-v-2bb13dfb class="register-list">
-                <el-form data-v-2bb13dfb :model="registerUser" :rules="registerRules" label-width="auto" style>
-                  <el-form-item class=" el-form-item--medium" prop="username">
+                <el-form data-v-2bb13dfb ref="registerUser" :model="registerUser" :rules="registerRules" label-width="auto" style>
+                  <el-form-item class=" el-form-item--medium" prop="email">
                     <el-input placeholder="请输入邮箱" prefix-icon="User" style="width: 300px" v-model="registerUser.email" />
                   </el-form-item>
-                  <el-form-item class=" el-form-item--medium" prop="username">
-                    <el-input placeholder="请输入密码" prefix-icon="User" style="width: 300px" v-model="registerUser.password" />
+                  <el-form-item class=" el-form-item--medium" prop="password">
+                    <el-input placeholder="请输入密码" type="password" prefix-icon="User" style="width: 300px" v-model="registerUser.password" />
                   </el-form-item>
-                  <el-form-item class=" el-form-item--medium" prop="username">
+                  <el-form-item class=" el-form-item--medium" prop="checkCode">
                     <el-input placeholder="请输入邮箱验证码" prefix-icon="User" style="width: 300px" v-model="registerUser.checkCode">
-                      <template slot="append"><el-link type="primary">获取验证码</el-link></template>
+                      <template slot="append"><el-link type="primary" @click="getCheck()">获取验证码</el-link></template>
                     </el-input>
                   </el-form-item>
                 </el-form>
-                <button data-v-2bb13dfb class="submit-btn continue">继续</button>
+                <button data-v-2bb13dfb class="submit-btn continue" @click="registerUsername('registerUser')">继续</button>
                 <p data-v-2bb13dfb class="login-tip">若已有账号，无需再注册</p>
               </div>
             </div>
@@ -227,13 +227,13 @@
         <div data-v-2bb13dfb data-v-c6eed236 class="all-box pla-all">
           <div data-v-2bb13dfb class="login-box">
             <ul data-v-2bb13dfb class="login-type-list">
-              <li data-v-2bb13dfb> 账号密码登录 </li>
+              <li data-v-2bb13dfb> 邮箱密码登录 </li>
             </ul>
             <div data-v-2bb13dfb class="login-content-list">
               <div data-v-2bb13dfb class="input-login" style>
                 <el-form :model="user" :rules="rules" label-width="auto" style>
-                  <el-form-item class=" el-form-item--medium" prop="username">
-                    <el-input placeholder="请输入账号" prefix-icon="User" style="width: 300px" v-model="user.username" />
+                  <el-form-item class=" el-form-item--medium" prop="email">
+                    <el-input placeholder="请输入邮箱" prefix-icon="User" style="width: 300px" v-model="user.email" />
                   </el-form-item>
                   <el-form-item class=" el-form-item--medium" prop="password">
                     <el-input placeholder="请输入密码" type="password" prefix-icon="Lock" style="width:300px"
@@ -266,12 +266,35 @@ import _axios from '@/axios/myaxios'
 
 
 const option = {
-    data:function() {
+  data: function () {
+
+    var validateNewPassword = (rule, value, callback) => {
+      if (value == "") {
+        callback(new Error('请输入密码'));
+      } else {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,16}$/;
+        if (!regex.test(this.registerUser.password)) {
+          callback(new Error('密码必须包含大写字母、小写字母和数字，且长度在8到16位之间'));
+        } else {
+          callback();
+        }
+      }
+    };
     return {
+      registerRules:{
+        email: [
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
+        ],
+        password: [
+          { validator: validateNewPassword, trigger: 'blur' }
+        ],
+        checkCode: [
+          { required: true, message: '请输入验证码', trigger: 'blur' },
+        ]
+      },
       rules: {
-        username: [
-          { required: true, message: '请输入账号', trigger: 'blur' },
-          { min: 3, max: 16, message: '长度应该在3到16之间', trigger: 'blur' }
+        email: [
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' }
@@ -279,7 +302,7 @@ const option = {
       },
       registerFormVisible: false,
       user: {
-        username: '',
+        email: '',
         password: ''
       },
       registerUser:{
@@ -292,6 +315,28 @@ const option = {
     }
     },
     methods: {
+      validateEmailFunction(email) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+      },
+      getCheck() {
+        if (!this.validateEmailFunction(this.registerUser.email)) {
+          this.$message.error('请输入有效的邮箱地址');
+          return;  // 结束操作，不发送请求
+        }
+        const params = new URLSearchParams
+        params.append("email",this.registerUser.email)
+        _axios.post("/user/sendMail?"+params).then(resp => {
+          if (resp.data.code == 1) {
+            this.$message({
+              message: '获取验证码成功，在两分钟内完成注册',
+              type: 'success'
+            });
+          } else {
+            this.$message.error(resp.data.msg)
+          }
+        })
+      },
       exit() {
         _axios.post("/user/exit").then(resp => {
           if (resp.data.code == 1) {
@@ -307,7 +352,7 @@ const option = {
       },
       close() {
         this.user = {
-          username: '',
+          email: '',
           password: ''
         }, this.registerUser = {
             checkCode: '',
@@ -364,8 +409,27 @@ const option = {
       // 为当前点击的链接添加 active 类
       target.classList.add('active');
       },
-
-      
+      registerUsername(registerUser) {
+        console.log(this.registerUser)
+        this.$refs[registerUser].validate((valid) => {
+          if (valid) {
+            _axios.post("/user/register",this.registerUser).then(resp => {
+                if(resp.data.code === 1 ){
+                  this.$message({
+                    message: '注册成功，请登录',
+                    type: 'success',
+                  });
+                  this.registerFormVisible = false
+                }else{
+                  this.$message.error(resp.data.msg)
+                }
+            })
+          } else {
+            this.$message.error('表单验证失败');
+            return false;
+          }
+        })
+      },
       bindSearchInputEvent() {
         // 绑定搜索框的输入事件
         document.querySelector('.header .h_search .header-search-body input')
