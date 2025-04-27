@@ -67,7 +67,8 @@
                                             style="width: 280px;height: 30px;">
                                     </div>
                                     <div data-v-b4e21218 v-if=" data.teachplanMediaList.length != 0" class="media-file">
-                                        <el-link>
+                                        <el-link style="margin-right: 10px;" v-for="media in data.teachplanMediaList"
+                                            :key="media.id">
                                             <i class="el-icon-delete"></i>
                                             <span>1.jpg</span>
                                         </el-link>
@@ -75,6 +76,7 @@
                                     <div data-v-b4e21218 class="buttons">
                                         <el-button v-if="data.grande == 1" type="text"
                                             @click="append(data)">添加小节</el-button>
+                                        <el-button type="text" @click="addMediaVisible = true">上传视频</el-button>
                                         <el-button type="text" @click="remove(node,data)">删除</el-button>
                                         <el-button type="text" @click="upNode(node,data)">上移</el-button>
                                         <el-button type="text" @click="downNode(node,data)">下移</el-button>
@@ -117,7 +119,8 @@
                     </div>
                 </div>
                 <div data-v-1b10f526 v-show="active === 3" class="step-body">
-                    <el-input data-v-38e7a12e  style="width: 200px;" placeholder="教师名称" suffix-icon="el-icon-search" v-model="searchTeacherName">
+                    <el-input data-v-38e7a12e style="width: 200px;" placeholder="教师名称" suffix-icon="el-icon-search"
+                        v-model="searchTeacherName">
                     </el-input>
                     <el-table data-v-38e7a12e class="dataList" :data="teacherList" border style="width: 100%">
                         <el-table-column align="center" prop="name" label="姓名">
@@ -136,8 +139,10 @@
                         <el-table-column align="center" label="操作">
                             <template slot-scope="scope">
                                 <div class="cell">
-                                    <el-button type="text" size="mini" :disabled="scope.row.isTeacher" @click="addTeacherToCourse(scope.row)">加入&nbsp;</el-button>
-                                    <el-button type="text" size="mini" :disabled="!scope.row.isTeacher" @click="removeTeacherToCourse(scope.row)">移除</el-button>
+                                    <el-button type="text" size="mini" :disabled="scope.row.isTeacher"
+                                        @click="addTeacherToCourse(scope.row)">加入&nbsp;</el-button>
+                                    <el-button type="text" size="mini" :disabled="!scope.row.isTeacher"
+                                        @click="removeTeacherToCourse(scope.row)">移除</el-button>
                                 </div>
                             </template>
                         </el-table-column>
@@ -156,13 +161,19 @@
                 <el-button type="primary" @click="next('courseBaseInfo')">保存并进行下一步</el-button>
             </div>
         </div>
+
+        <upload-media-view :visible.sync="addMediaVisible"></upload-media-view>
     </div>
 </template>
 <script>
 import _axios from '@/axios/myaxios';
-
+import UploadMediaView from './upload/UploadMediaView.vue';
 
 const options = {
+    components: {
+        UploadMediaView
+    },
+    
     watch:{
         searchTeacherName(val){
             this.getTeacherList()
@@ -170,6 +181,7 @@ const options = {
     },
     data () {
         return {
+            addMediaVisible:false,
             teacherList:[],
             showCourseTime:false,
             courseTime:{

@@ -243,7 +243,7 @@
                 <div data-v-2bb13dfb class="other-ope-con">
                   <div data-v-2bb13dfb class="other-ope">
                     <span data-v-2bb13dfb>忘记密码</span>
-                    <span data-v-2bb13dfb>
+                    <span data-v-2bb13dfb @click="registerFormVisible = true,dialogFormVisible=false">
                       去注册
                     </span>
                   </div>
@@ -338,15 +338,16 @@ const option = {
         })
       },
       exit() {
+        sessionStorage.clear('jwt');
+        sessionStorage.clear('user');
+        window.location.reload();
         _axios.post("/user/exit").then(resp => {
           if (resp.data.code == 1) {
             this.$message({
               message: '退出成功',
               type: 'success'
             });
-            sessionStorage.clear('jwt');
-            sessionStorage.clear('user');
-            window.location.reload();
+           
           }
         })
       },
