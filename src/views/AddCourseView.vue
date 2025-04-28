@@ -73,14 +73,16 @@
                                             <span>1.jpg</span>
                                         </el-link>
                                     </div>
+                                    
                                     <div data-v-b4e21218 class="buttons">
                                         <el-button v-if="data.grande == 1" type="text"
                                             @click="append(data)">添加小节</el-button>
-                                        <el-button type="text" @click="addMediaVisible = true">上传视频</el-button>
+                                        <el-button type="text" @click="addMediaVisible = true ,chapter = data">上传视频</el-button>
                                         <el-button type="text" @click="remove(node,data)">删除</el-button>
                                         <el-button type="text" @click="upNode(node,data)">上移</el-button>
                                         <el-button type="text" @click="downNode(node,data)">下移</el-button>
                                     </div>
+
                                 </div>
                             </div>
                         </el-tree>
@@ -162,7 +164,7 @@
             </div>
         </div>
 
-        <upload-media-view :visible.sync="addMediaVisible"></upload-media-view>
+        <upload-media-view :visible.sync="addMediaVisible" :chapter="chapter"></upload-media-view>
     </div>
 </template>
 <script>
@@ -181,6 +183,7 @@ const options = {
     },
     data () {
         return {
+            chapter: {},
             addMediaVisible:false,
             teacherList:[],
             showCourseTime:false,

@@ -1,9 +1,17 @@
 <template>
     <el-dialog title="视频上传" border :visible.sync="addMediaVisible">
             <el-table :data="mediaDataList">
-                <el-table-column property="date" align="center" label="文件名"></el-table-column>
-                <el-table-column property="name" align="center" label="大小"></el-table-column>
-                <el-table-column property="address" align="center" label="上传进度"></el-table-column>
+                <el-table-column property="chapterName" align="center" label="章节名称"></el-table-column>
+                <el-table-column property="name" align="center" label="文件名"></el-table-column>
+                <el-table-column property="size" align="center" label="大小"></el-table-column>
+                <el-table-column property="progress" align="center" label="上传进度">
+                    <template slot-scope="scope">
+                        <el-progress :percentage="scope.row.progress" :format="format"></el-progress>
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" label="操作">
+                    
+                </el-table-column>
             </el-table>
             <span slot="footer" class="dialog-footer">
                 <el-upload action="#" :auto-upload="false" :accept="'video/*'" :show-file-list="false"
@@ -16,15 +24,21 @@
 </template>
 <script>
 import SparkMD5 from 'spark-md5';
+import _axios from '@/axios/myaxios';
 
 export default {
     props: {
         visible: {
             type: Boolean,
             required: true
+        },
+        chapter: {
+            type: Object,
+            required: false
         }
     },
     computed: {
+
         addMediaVisible: {
             get() {
                 return this.visible;
@@ -45,9 +59,14 @@ export default {
             progress:0,   //上传进度
             isPause: false,     // 是否上传暂停中
             isCancel: false,    // 是否取消上传
+            currentUploadIndex: 0,
+
         }
     },
     methods: {
+        format(percentage) {
+            return percentage === 100 ? '满' : `${percentage}%`;
+        },
         // 根据整个文件的文件名和大小组合的字符串生成hash值，大概率确定文件的唯一性
         fhash(file) {
             // console.log("哈希字段: ", file.name+file.size.toString());
@@ -58,28 +77,52 @@ export default {
             })
         },
         async changeFile(file){
-
+            console.log(this.chapter)
             if (!file) return;
             file = file.raw;
             if (file.type != "video/mp4") {
                 this.$message('文件类型不符合');
                 return;
             }
-            
-            const maxSizeInBytes = 4000 * 1024 * 1024; // 600MB
+            const maxSizeInBytes = 4000 * 1024 * 1024; // 4000MB
             
             if (file.size <= maxSizeInBytes) {
-                this.selectedVideo = file;
-                this.videoName = file.name.split(".mp4")[0];
-                this.hash = await this.fhash(this.selectedVideo);
-                this.upload()  
+                const fileInfo = {
+                    id: this.chapter.id,
+                    chapterName: this.chapter.name,
+                    name: file.name,
+                    size: file.size.toString(),
+                    progress: 0,
+                    file: file
+                };
+                this.mediaDataList.push(fileInfo);
+                // 如果当前没有文件在上传，则开始上传新文件
+                if (this.mediaDataList.length === 1) {
+                    await this.uploadFile(this.mediaDataList[this.currentUploadIndex]);
+                }
             } else {
                 // 文件大小超出限制
                 this.$message("视频太大了~");
             }
         },
-        async upload() {
-            if (!this.selectedVideo) {
+        async uploadFile(fileInfo) {
+            this.selectedMedia = fileInfo.file;
+            this.videoName = fileInfo.name.split(".mp4")[0];
+            this.hash = await this.fhash(this.selectedMedia);
+            await this.upload(fileInfo);
+            
+            // 上传完成后更新状态并移除文件信息
+            fileInfo.progress = 100;
+            this.mediaDataList.splice(this.currentUploadIndex, 1);  // 移除文件信息
+            this.currentUploadIndex = this.mediaDataList.length > 0 ? 0 : -1;
+            // 检查是否有其他文件待上传
+            if (this.mediaDataList.length > 0) {
+                await this.uploadFile(this.mediaDataList[this.currentUploadIndex]);
+            }
+            this.currentUploadIndex = 0
+        },
+        async upload(fileInfo) {
+            if (!this.selectedMedia) {
                 this.$message.error('未选择文件');
                 return;
             }
@@ -95,7 +138,7 @@ export default {
                 try{
                     const res = await this.uploadChunk(formData);
                     if (res.data.code !== 1) {
-                        this.$message.error("上传失败")
+                        this.$message.error(res.data.msg)
                         this.isFailed = true;
                         this.isPause = true;
                     }
@@ -113,8 +156,14 @@ export default {
                     return;
                 }
                 this.progress = Math.round(((this.current + 1) / chunks.length) * 100); // 实时改进度条
+                fileInfo.progress = this.progress;
+                console.log(this.progress)
             }
             this.progress = 100;    // 上传完成再次确认为100%
+            const formData = new FormData();  //用于post请求的参数构造
+            formData.append('hash', this.hash);
+            formData.append('chapter',this.chapter)
+            _axios.post("/video/merge",formData)
         },
         
 
