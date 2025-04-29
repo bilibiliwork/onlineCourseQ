@@ -67,17 +67,17 @@
                                             style="width: 280px;height: 30px;">
                                     </div>
                                     <div data-v-b4e21218 v-if=" data.teachplanMediaList.length != 0" class="media-file">
-                                        <el-link style="margin-right: 10px;" v-for="media in data.teachplanMediaList"
-                                            :key="media.id">
+                                        <el-link style="margin-right: 10px;" @click="getMediaList(data.id)">
                                             <i class="el-icon-delete"></i>
-                                            <span>1.jpg</span>
+                                            <span>查看文件</span>
                                         </el-link>
                                     </div>
-                                    
+
                                     <div data-v-b4e21218 class="buttons">
                                         <el-button v-if="data.grande == 1" type="text"
                                             @click="append(data)">添加小节</el-button>
-                                        <el-button type="text" @click="addMediaVisible = true ,chapter = data">上传视频</el-button>
+                                        <el-button type="text"
+                                            @click="addMediaVisible = true ,chapter = data">上传视频</el-button>
                                         <el-button type="text" @click="remove(node,data)">删除</el-button>
                                         <el-button type="text" @click="upNode(node,data)">上移</el-button>
                                         <el-button type="text" @click="downNode(node,data)">下移</el-button>
@@ -164,6 +164,22 @@
             </div>
         </div>
 
+
+        <el-dialog title="视频文件" border @close="clearMediaList()" :visible.sync="teachPlanMediaVisible">
+            <el-table :data="mediaDataList">
+                <el-table-column property="mediaFilename" align="center" label="视频名称"></el-table-column>
+                <el-table-column align="center" label="操作">
+                    <template slot-scope="scope">
+                        <div class="cell">
+                           <!--  <el-button type="text" size="mini" 
+                                @click="updateMediaName(scope.row.id)">修改视频名称&nbsp;</el-button> -->
+                            <el-button type="text" size="mini" 
+                                @click="removeMedia(scope.row.id)">移除</el-button>
+                        </div>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
         <upload-media-view :visible.sync="addMediaVisible" :chapter="chapter"></upload-media-view>
     </div>
 </template>
@@ -183,6 +199,7 @@ const options = {
     },
     data () {
         return {
+            teachPlanMediaVisible:false,
             chapter: {},
             addMediaVisible:false,
             teacherList:[],
@@ -233,9 +250,29 @@ const options = {
                 {value: 11, label: '艺术设计' },{value: 15,label: '营销'},
                 {value: 16,label: '财务'},{value: 17,label: '农林园艺'},
             ],
+            mediaDataList:[]
         }
     },
     methods: {
+        
+        removeMedia(id){
+            _axios.delete("/teachplan-media/remove/"+id).then(resp => {
+                this.$message({
+                    message: '视频已删除',
+                    type: 'success'
+                });
+                this.mediaDataList = this.mediaDataList.filter(item => item.id !== id)
+            })
+        },
+        clearMediaList(){
+            // this.mediaDataList = []
+        },
+        getMediaList(id){
+            this.teachPlanMediaVisible = true;
+            _axios.get("/teachplan-media/teachplan/"+id).then(resp => {
+                this.mediaDataList = resp.data.data
+            })
+        },
         addTeacherToCourse(data){
             _axios.put("/course-teacher/add/"+this.courseBaseInfo.id,data)
             data.isTeacher = true;

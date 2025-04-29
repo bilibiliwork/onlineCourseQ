@@ -77,7 +77,6 @@ export default {
             })
         },
         async changeFile(file){
-            console.log(this.chapter)
             if (!file) return;
             file = file.raw;
             if (file.type != "video/mp4") {
@@ -93,7 +92,10 @@ export default {
                     name: file.name,
                     size: file.size.toString(),
                     progress: 0,
-                    file: file
+                    file: file,
+                    isPause: false,
+                    isCancel: true,
+                    chapter: this.chapter
                 };
                 this.mediaDataList.push(fileInfo);
                 // 如果当前没有文件在上传，则开始上传新文件
@@ -147,11 +149,19 @@ export default {
                     return;
                 }
                 // 暂停上传
-                if (this.isPause) {
+                if (fileInfo.isPause) {
                     // 取消上传彻底删除已上传分片
-                    if (this.isCancel) {
+                    if (fileInfo.isCancel) {
                         await this.cancelUpload(this.hash);
-                        this.isCancel = false;
+                        // 删除 fileInfo
+                        this.mediaDataList.splice(this.mediaDataList.indexOf(fileInfo), 1);
+                        this.currentUploadIndex = this.mediaDataList.length > 0 ? 0 : -1;
+                        // 检查是否有其他文件待上传
+                        if (this.mediaDataList.length > 0) {
+                            await this.uploadFile(this.mediaDataList[this.currentUploadIndex]);
+                        }
+                        this.currentUploadIndex = 0
+                        fileInfo.isCancel = false;
                     }
                     return;
                 }
@@ -160,10 +170,20 @@ export default {
                 console.log(this.progress)
             }
             this.progress = 100;    // 上传完成再次确认为100%
+            console.log(fileInfo.chapter)
             const formData = new FormData();  //用于post请求的参数构造
             formData.append('hash', this.hash);
-            formData.append('chapter',this.chapter)
-            _axios.post("/video/merge",formData)
+            formData.append('teachPlanId',fileInfo.chapter.id)
+            formData.append('courseId',fileInfo.chapter.courseId)
+            formData.append('name',fileInfo.name)
+            _axios.post("/video/merge",formData).then(resp => {
+                if(resp.data.code == 1){
+                    this.$message({
+                        message: '已上传到服务器，稍后将添加该课程',
+                        type: 'success'
+                    });
+                }
+            })
         },
         
 
