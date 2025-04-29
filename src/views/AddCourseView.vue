@@ -256,12 +256,12 @@ const options = {
     methods: {
         
         removeMedia(id){
+            this.mediaDataList = this.mediaDataList.filter(item => item.id !== id)
             _axios.delete("/teachplan-media/remove/"+id).then(resp => {
                 this.$message({
                     message: '视频已删除',
                     type: 'success'
-                });
-                this.mediaDataList = this.mediaDataList.filter(item => item.id !== id)
+                });  
             })
         },
         clearMediaList(){
