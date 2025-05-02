@@ -443,6 +443,8 @@ const option = {
 
         },
         changeSpanStatus() {
+            
+
             const typeCons = document.querySelectorAll(".typeCon");
             const spans = document.querySelectorAll("span.t3");
 

@@ -5,10 +5,10 @@
             <div data-v-1c1951e6 class="indexBox show" style="height: 514.794px; margin-bottom: 24px;">
                 <div data-v-1c1951e6 class="bannerBox">
                     <el-carousel :interval="5000" data-v-1c1951e6 trigger="click" height="514.794px">
-                        <el-carousel-item v-for="item in imageCarousel" :key="item">
-                            <a data-v-1c1951e6 :href="item" class="home-banner-item home-banner-1">
+                        <el-carousel-item v-for="item in imageCarouselList" :key="item.pid">
+                            <router-link data-v-1c1951e6 :to="'/plan/' + item.pid" class="home-banner-item home-banner-1">
                                 <div data-v-1c1951e6 class="item"
-                                    :style="{ background: `url('${item}') center center / cover no-repeat` }">
+                                    :style="{ background: `url('${item.coverUrl}') center center / cover no-repeat` }">
                                     <div data-v-1c1951e6 class="container">
                                         <div data-v-1c1951e6 class="row">
                                             <div data-v-1c1951e6 class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
@@ -24,7 +24,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </a>
+                            </router-link>
                         </el-carousel-item>
                         <div class="container _mask"></div>
                     </el-carousel>
@@ -832,14 +832,17 @@ const options={
             hotCourseList:[],
             planStatus:[],
             planList:[],
-            imageCarousel:[
+            imageCarouselList:[
+
+            ],
+          /*   imageCarousel:[
             "https://pzwtxdy.oss-cn-beijing.aliyuncs.com/17332777791633.png",
             "https://pzwtxdy.oss-cn-beijing.aliyuncs.com/17376805805201.png",
             "https://pzwtxdy.oss-cn-beijing.aliyuncs.com/17377016122230.jpg",
             "https://pzwtxdy.oss-cn-beijing.aliyuncs.com/17376807562561.png",
             "https://pzwtxdy.oss-cn-beijing.aliyuncs.com/17362380393148.jpg",
             "https://pzwtxdy.oss-cn-beijing.aliyuncs.com/17376806689798.jpg"
-            ],
+            ], */
             imagePartner:[
                 {
                     image:"https://pzwtxdy.oss-cn-beijing.aliyuncs.com/tshinghua.png",
@@ -881,10 +884,20 @@ const options={
                     image: "https://pzwtxdy.oss-cn-beijing.aliyuncs.com/sxmooc.png",
                     url:"https://sxmooc.xjtu.edu.cn/pro/portal/home"
                 }
-            ]
+            ],
+            carouselIndex:[1,14,27,28,29,30]
         }
     },
     methods: {
+        getImageCarouselList(){
+            const params = new URLSearchParams()
+            params.append("planIds",this.carouselIndex)
+            _axios.get("/plan/carousel?"+params).then( resp => {
+                if(resp.data.code == 1){
+                    this.imageCarouselList = resp.data.data
+                }
+            })
+        },
         queryPlanStatus(){
             _axios.get('/plan/list').then(resp =>{
                 this.planList = resp.data.data;
@@ -919,6 +932,7 @@ const options={
         this.bindTagChange()
         this.queryByStatus()
         this.queryPlanStatus()
+        this.getImageCarouselList()
     },
 }
 export default options;

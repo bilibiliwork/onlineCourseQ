@@ -83,7 +83,7 @@ export default {
                 this.$message('文件类型不符合');
                 return;
             }
-            const maxSizeInBytes = 4000 * 1024 * 1024; // 4000MB
+            const maxSizeInBytes = 1024 * 1024 * 1024; // 1GB
             
             if (file.size <= maxSizeInBytes) {
                 const fileInfo = {

@@ -7,7 +7,7 @@ import CourseDetailView from '@/views/CourseDetailView.vue'
 import CourseView from '@/views/CourseView.vue'
 import VideoView from '@/views/VideoView.vue'
 import LearnView from '@/views/LearnView.vue'
-import MediaView from '@/views/MediaView.vue'
+import MediaView from '@/views/Aliyun/MediaView.vue'
 import DiscussView from '@/views/DiscussView.vue'
 import ProfilesView from '@/views/ProfilesView.vue'
 import MyCourseView from '@/views/MyCourseView.vue'
@@ -27,6 +27,7 @@ import AddCourseView from '@/views/AddCourseView.vue'
 import CourseListView from '@/views/CourseListView.vue'
 import MediaListView from '@/views/MediaListView.vue'
 import TeacherListView from '@/views/TeacherListView.vue'
+import AliyunMediaView from '@/views/Aliyun/AliyunMediaView.vue'
 
 Vue.use(VueRouter)
 
@@ -169,7 +170,12 @@ const routes = [
           path: 'discuss/:did',
           name: 'discuss',
           component: DiscussView,
-        }]
+        }, {
+          path: 'aliyun',
+          name: 'aliyun',
+          component: AliyunMediaView,
+        }
+      ]
       },
       {
         path: 'forum',

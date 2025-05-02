@@ -78,6 +78,8 @@
                                             @click="append(data)">添加小节</el-button>
                                         <el-button type="text"
                                             @click="addMediaVisible = true ,chapter = data">上传视频</el-button>
+                                        <!-- <el-button type="text"
+                                            @click="addDiscuss(data.id)">发布讨论</el-button> -->
                                         <el-button type="text" @click="remove(node,data)">删除</el-button>
                                         <el-button type="text" @click="upNode(node,data)">上移</el-button>
                                         <el-button type="text" @click="downNode(node,data)">下移</el-button>
@@ -199,6 +201,7 @@ const options = {
     },
     data () {
         return {
+            addDiscussVisible:false,
             teachPlanMediaVisible:false,
             chapter: {},
             addMediaVisible:false,
