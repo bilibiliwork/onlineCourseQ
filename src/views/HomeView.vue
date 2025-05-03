@@ -9,7 +9,7 @@
               class="h_logo">
             <ul data-v-61b17279 class="h_menus">
               <li data-v-61b17279>
-                <a data-v-61b17279 href="/#/main" class="active">首页</a>
+                <a data-v-61b17279 href="/#/main" :class="{ active : isActive('/main')}">首页</a>
               </li>
               <li data-v-61b17279>
                 <a data-v-61b17279 href="/#/course" class>全部课程</a>
@@ -17,7 +17,9 @@
               <li data-v-61b17279>
                 <div data-v-61b17279 class="corner">
                   <!-- <a>标签的target属性指定了点击链接后，页面将在何处打开。target属性有几个不同的值 -->
-                  <a data-v-61b17279 target="_parent" href="/#/video/17/learn" class>合作院校</a>
+                  <a data-v-61b17279 target="_parent" href="/#/school" 
+                  :class="{ active : isActive('/school')}"
+                  >合作院校</a>
                 </div>
               </li>
               <li data-v-61b17279>
@@ -315,6 +317,9 @@ const option = {
     }
     },
     methods: {
+      isActive(routePath) {
+            return this.$route.path.includes(routePath);
+      },
       validateEmailFunction(email) {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailRegex.test(email);
@@ -391,25 +396,25 @@ const option = {
             name: 'course'
           });
       },
-      bindMenuClickEvents() {
+     /*  bindMenuClickEvents() {
         //切换状态栏的函数
         var lia = document.querySelectorAll('.h_menus li a')
-        for(var i=0;i<lia.length;i++){
-        lia[i].addEventListener('click', this.changeTab);
-      }
+        for (var i = 0; i < lia.length; i++) {
+          lia[i].addEventListener('click', this.changeTab);
+        }
       },
       // .header .h_login .h_login_login.txt[data-v-61b17279] 
-      changeTab(event){
+      changeTab(event) {
         // 获取当前点击的链接
-      const target = event.currentTarget;
-      // 移除所有链接的 active 类
-      const lia = document.querySelectorAll('.h_menus li a');
-      lia.forEach((link) => {
-        link.classList.remove('active');
-      });
-      // 为当前点击的链接添加 active 类
-      target.classList.add('active');
-      },
+        const target = event.currentTarget;
+        // 移除所有链接的 active 类
+        const lia = document.querySelectorAll('.h_menus li a');
+        lia.forEach((link) => {
+          link.classList.remove('active');
+        });
+        // 为当前点击的链接添加 active 类
+        target.classList.add('active');
+      }, */
       registerUsername(registerUser) {
         console.log(this.registerUser)
         this.$refs[registerUser].validate((valid) => {
@@ -485,7 +490,7 @@ const option = {
 
     mounted() {
       // this.bindLoginAndRegister();
-      this.bindMenuClickEvents();
+      // this.bindMenuClickEvents();
       this.bindSearchInputEvent();
       this.bindClearIconEvents();
 

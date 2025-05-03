@@ -6,7 +6,7 @@
             <div data-v-0f935fab class="hover_overflow" style="height: 100%;">
                 <div data-v-0f935fab style="width: 791px; padding-bottom: 70px;">
                     <p data-v-0f935fab class="title">
-                        脑科学研究的历史
+                        {{ discuss.title }}
                     </p>
                     <div data-v-0f935fab class="list">
                         <div data-v-0f935fab class="t2 fuwenben xmodule_display xmodule_HtmlModule">

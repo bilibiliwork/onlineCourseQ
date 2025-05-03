@@ -40,9 +40,9 @@ export default options
 /* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
   font-family: 'iconfont';  /* Project id 4832446 */
-  src: url('//at.alicdn.com/t/c/font_4832446_yzqqju5jm98.woff2?t=1743919884034') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4832446_yzqqju5jm98.woff?t=1743919884034') format('woff'),
-       url('//at.alicdn.com/t/c/font_4832446_yzqqju5jm98.ttf?t=1743919884034') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4832446_3eji86anzi3.woff2?t=1746259094352') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4832446_3eji86anzi3.woff?t=1746259094352') format('woff'),
+       url('//at.alicdn.com/t/c/font_4832446_3eji86anzi3.ttf?t=1746259094352') format('truetype');
 }
 
 a {

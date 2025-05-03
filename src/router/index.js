@@ -28,6 +28,8 @@ import CourseListView from '@/views/CourseListView.vue'
 import MediaListView from '@/views/MediaListView.vue'
 import TeacherListView from '@/views/TeacherListView.vue'
 import AliyunMediaView from '@/views/Aliyun/AliyunMediaView.vue'
+import SchoolView from '@/views/school/SchoolView.vue'
+import SchoolDetailView from '@/views/school/SchoolDetail.vue'
 
 Vue.use(VueRouter)
 
@@ -83,6 +85,17 @@ const routes = [
         name: 'courseDetail',
         component: CourseDetailView
       },
+      {
+        path: 'school',
+        name: 'school',
+        component: SchoolView
+          
+      },
+      {
+        path: 'schoolDetail/:schoolId',
+        name: 'schoolDetail',
+        component: SchoolDetailView,
+      }
     ],
 
   },

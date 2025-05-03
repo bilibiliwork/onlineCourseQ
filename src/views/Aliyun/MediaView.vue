@@ -91,6 +91,7 @@ const options = {
                 }, function (player) {
                     player.play();
                 });
+            this.player.play()
         }
     },
     mounted() {

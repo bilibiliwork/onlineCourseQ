@@ -18,7 +18,9 @@
                             <li data-v-61b17279>
                                 <div data-v-61b17279 class="corner">
                                     <!-- <a>标签的target属性指定了点击链接后，页面将在何处打开。target属性有几个不同的值 -->
-                                    <a data-v-61b17279 target="_parent" href="/#/video/1/learn" class>合作院校</a>
+                                        <a data-v-61b17279 target="_parent" href="/#/school" 
+                                        
+                                        >合作院校</a>
                                 </div>
                             </li>
                             <li data-v-61b17279>
@@ -443,8 +445,7 @@ const option = {
 
         },
         changeSpanStatus() {
-            
-
+        
             const typeCons = document.querySelectorAll(".typeCon");
             const spans = document.querySelectorAll("span.t3");
 
@@ -473,6 +474,7 @@ const option = {
         },
 
         onCourse() {
+            this.currentPage = 1
             this.queryPage()
         },
         bindMenuClickEvents() {
